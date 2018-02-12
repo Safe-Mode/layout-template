@@ -4,20 +4,24 @@
   "description": "template to start interface's front-end dev",
   "main": "gulpfile.js",
   "dependencies": {
-    "normalize.css": "^7.0.0"
+    "normalize.css": "^8.0.0"
   },
   "devDependencies": {
-    "autoprefixer": "^7.1.6",
+    "autoprefixer": "^8.0.0",
     "browser-sync": "^2.18.13",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-csso": "^3.0.0",
-    "gulp-imagemin": "^3.4.0",
+    "gulp-imagemin": "^4.1.0",
     "gulp-plumber": "^1.1.0",
     "gulp-postcss": "^7.0.0",
+    "gulp-posthtml": "^3.0.4",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
+    "gulp-svgstore": "^6.1.1",
     "gulp-uglify": "^3.0.0",
+    "gulp-webp": "^3.0.0",
+    "posthtml-include": "^1.1.0",
     "run-sequence": "^2.2.0"
   },
   "scripts": {

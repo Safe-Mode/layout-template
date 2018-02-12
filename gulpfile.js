@@ -45,7 +45,7 @@ gulp.task('images', function() {
   return gulp.src('img/**/*.{jpg,png,svg}')
     .pipe(imagemin([
       imagemin.optipng({optimizationLevel: 3}),
-      imagemin.jpegtran({progressive: true})
+      imagemin.jpegtran({progressive: true}),
       imagemin.svgo()
     ]))
     .pipe(gulp.dest('build/img'));
@@ -103,5 +103,5 @@ gulp.task('clean', function () {
 });
 
 gulp.task('build', function(done) {
-  run('clean', 'copy', 'style', 'images', 'webp', 'sprite', 'html', 'script', done);
+  run('clean', 'copy', 'style', 'images', 'webp', 'sprite', 'html', done);
 });
