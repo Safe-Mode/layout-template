@@ -7,9 +7,12 @@
     "normalize.css": "^8.0.0"
   },
   "devDependencies": {
+    "@htmlacademy/editorconfig-cli": "^1.0.0",
     "autoprefixer": "^8.0.0",
     "browser-sync": "^2.18.13",
     "del": "^3.0.0",
+    "eslint": "^4.17.0",
+    "eslint-config-htmlacademy": "^0.4.2",
     "gulp": "^3.9.1",
     "gulp-csso": "^3.0.0",
     "gulp-imagemin": "^4.1.0",
@@ -22,9 +25,13 @@
     "gulp-uglify": "^3.0.0",
     "gulp-webp": "^3.0.0",
     "posthtml-include": "^1.1.0",
-    "run-sequence": "^2.2.0"
+    "run-sequence": "^2.2.0",
+    "stylelint": "^8.4.0",
+    "stylelint-config-htmlacademy": "^0.1.1"
   },
   "scripts": {
+    "editorconfig": "editorconfig-cli",
+    "stylelint": "stylelint sass/**/*.scss --syntax scss",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "gulp build",
     "start": "npm run build && gulp serve"
