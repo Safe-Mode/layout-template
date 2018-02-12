@@ -32,15 +32,15 @@
   "scripts": {
     "editorconfig": "editorconfig-cli",
     "stylelint": "stylelint sass/**/*.scss --syntax scss",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run editorconfig && npm run stylelint && eslint js/",
     "build": "gulp build",
     "start": "npm run build && gulp serve"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://Safe_Mode@bitbucket.org/Safe_Mode/kristata.git"
+    "url": "git+https://github.com/Safe-Mode/layout-template.git"
   },
   "author": "Safe_Mode",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/Safe_Mode/kristata#readme"
+  "homepage": "https://github.com/Safe-Mode/layout-template#readme"
 }
