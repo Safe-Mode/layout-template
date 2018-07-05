@@ -1,0 +1,56 @@
+@mixin container {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0 20px;
+  min-width: $width-mobile;
+
+  @media (min-width: $width-tablet-s) {
+    padding: 0 25px;
+  }
+
+  @media (min-width: $width-tablet-m) {
+    padding: 0 35px;
+  }
+
+  @media (min-width: $width-tablet-l) {
+    padding-right: 70px;
+    padding-left: 180px;
+  }
+}
+
+@mixin btn {
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 0;
+  border: none;
+
+  background-color: transparent;
+  cursor: pointer;
+}
+
+@mixin link-reset {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+@mixin list-reset {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+@mixin input-reset {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+
+  border: none;
+  background-color: transparent;
+}
+
+@mixin fieldset-reset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
