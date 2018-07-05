@@ -16,10 +16,12 @@ var include = require('posthtml-include');
 var del = require('del');
 var run = require('run-sequence');
 var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('style', function () {
   gulp.src('scss/style.scss')
     .pipe(plumber())
+    .pipe(sourcemaps.init())
     .pipe(sass())
     .pipe(postcss([
       autoprefixer()
@@ -27,16 +29,20 @@ gulp.task('style', function () {
     .pipe(gulp.dest('build/css'))
     .pipe(minify())
     .pipe(rename('style.min.css'))
+    .pipe(sourcemaps.write(''))
     .pipe(gulp.dest('build/css'))
     .pipe(server.stream());
 });
 
 gulp.task('script', function () {
   gulp.src('js/*.js')
+    .pipe(plumber())
+    .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(rename(
       {suffix: '.min'}
     ))
+    .pipe(sourcemaps.write(''))
     .pipe(gulp.dest('build/js'))
     .pipe(server.stream());
 });

@@ -21,6 +21,7 @@
     "gulp-posthtml": "^3.0.4",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.4",
     "gulp-svgstore": "^6.1.1",
     "gulp-uglify": "^3.0.0",
     "gulp-webp": "^3.0.0",
