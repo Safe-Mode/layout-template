@@ -1,0 +1,19 @@
+doctype html
+
+block vars
+
+html.no-js(lang="ru")
+  head
+    meta(charset="utf-8")
+    meta(name="description", content="")
+    meta(name="viewport", content="width=device-width, initial-scale=1, minimal-ui")
+    title #{title}
+    link(rel="stylesheet", href="css/style.min.css")
+
+  body.page
+    include ../includes/header
+    block content
+    include ../includes/footer
+
+    block scripts
+    script(src="js/script.min.js")
