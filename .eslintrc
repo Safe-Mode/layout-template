@@ -1,0 +1,6 @@
+{
+  "extends": "htmlacademy/es5",
+  "rules": {
+    // Additional rules...
+  }
+}

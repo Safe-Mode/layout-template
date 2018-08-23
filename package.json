@@ -1,6 +1,6 @@
 {
   "name": "layout-template",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "template to start interface's front-end dev",
   "main": "gulpfile.js",
   "dependencies": {
