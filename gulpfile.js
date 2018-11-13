@@ -15,11 +15,9 @@ const del = require('del');
 const run = require('run-sequence');
 const uglify = require('gulp-uglify-es').default;
 const sourcemaps = require('gulp-sourcemaps');
-const browserify = require('browserify');
-const source = require('vinyl-source-stream');
-const buffer = require('vinyl-buffer');
+const rollup = require(`gulp-better-rollup`);
+const babel = require('rollup-plugin-babel');
 const pug = require('gulp-pug');
-const combiner = require('stream-combiner2');
 
 const renderViews = (path) => {
   return gulp.src(path)
@@ -51,25 +49,32 @@ gulp.task('style', () => {
       .pipe(server.stream());
 });
 
-gulp.task('browserify', () => {
-  return combiner.obj([
-    browserify('js/main.js', {
-      debug: true
-    }).bundle(),
-    source('script.js'),
-    buffer(),
-    sourcemaps.init({
-      loadMaps: true
-    }),
-    uglify(),
-    rename({
-      suffix: '.min'
-    }),
-    sourcemaps.write(''),
-    gulp.dest('build/js/'),
-    server.stream()
-  ])
-  .on('error', console.error.bind(console));
+gulp.task('scripts', () => {
+  return gulp.src('js/main.js')
+      .pipe(plumber())
+      .pipe(sourcemaps.init({
+        loadMaps: true
+      }))
+      .pipe(rollup({
+        plugins: [
+          babel({
+            babelrc: false,
+            presets: [
+              [
+                '@babel/env',
+                {
+                  useBuiltIns: 'usage'
+                }
+              ]
+            ]
+          })
+        ]
+      }, 'iife'))
+      .pipe(uglify())
+      .pipe(rename('script.min.js'))
+      .pipe(sourcemaps.write(''))
+      .pipe(gulp.dest('build/js'))
+      .pipe(server.stream());
 });
 
 gulp.task('images', () => {
@@ -100,7 +105,7 @@ gulp.task('sprite', () => {
 gulp.task('serve', () => {
   server.init({
     server: 'build/',
-    notify: false,
+    notify: true,
     open: false,
     cors: true,
     ui: false
@@ -111,7 +116,7 @@ gulp.task('serve', () => {
   });
 
   gulp.watch('scss/**/*.{scss,sass}', ['style']);
-  gulp.watch('js/**/*.js', ['browserify']);
+  gulp.watch('js/**/*.js', ['scripts']);
   gulp.watch('views/**/*.pug', ['views']);
   gulp.watch('img/**/*.{jpg,png,svg}', ['images', 'copy']);
 });
@@ -133,5 +138,5 @@ gulp.task('clean', () => {
 });
 
 gulp.task('build', (done) => {
-  run('clean', 'copy', 'style', 'browserify', 'images', 'sprite', 'views', done);
+  run('clean', 'copy', 'style', 'scripts', 'images', 'sprite', 'views', done);
 });
