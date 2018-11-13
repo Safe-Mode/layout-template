@@ -11,8 +11,6 @@ const rename = require('gulp-rename');
 const imagemin = require('gulp-imagemin');
 const webp = require('gulp-webp');
 const svgstore = require('gulp-svgstore');
-const posthtml = require('gulp-posthtml');
-const include = require('posthtml-include');
 const del = require('del');
 const run = require('run-sequence');
 const uglify = require('gulp-uglify-es').default;
@@ -22,6 +20,20 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const pug = require('gulp-pug');
 const combiner = require('stream-combiner2');
+
+const renderViews = function (path) {
+  return gulp.src(path)
+    .pipe(plumber())
+    .pipe(pug({
+      pretty: true
+    }))
+    .pipe(gulp.dest('build/'))
+    .pipe(server.stream());
+};
+
+gulp.task('views', function () {
+  return renderViews('views/*.pug');
+});
 
 gulp.task('style', function () {
   gulp.src('scss/main.scss')
@@ -85,16 +97,6 @@ gulp.task('sprite', function () {
       .pipe(gulp.dest('build/img'));
 });
 
-gulp.task('views', function () {
-  return gulp.src('views/*.pug')
-      .pipe(plumber())
-      .pipe(pug({
-        pretty: true
-      }))
-      .pipe(gulp.dest('build/'))
-      .pipe(server.stream());
-});
-
 gulp.task('serve', function () {
   server.init({
     server: 'build/',
@@ -102,6 +104,10 @@ gulp.task('serve', function () {
     open: false,
     cors: true,
     ui: false
+  });
+
+  gulp.watch('views/**/*.pug', function (event) {
+    return renderViews(event.path);
   });
 
   gulp.watch('scss/**/*.{scss,sass}', ['style']);
