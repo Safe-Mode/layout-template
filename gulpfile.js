@@ -21,7 +21,7 @@ const buffer = require('vinyl-buffer');
 const pug = require('gulp-pug');
 const combiner = require('stream-combiner2');
 
-const renderViews = function (path) {
+const renderViews = (path) => {
   return gulp.src(path)
     .pipe(plumber())
     .pipe(pug({
@@ -31,11 +31,11 @@ const renderViews = function (path) {
     .pipe(server.stream());
 };
 
-gulp.task('views', function () {
+gulp.task('views', () => {
   return renderViews('views/*.pug');
 });
 
-gulp.task('style', function () {
+gulp.task('style', () => {
   gulp.src('scss/main.scss')
       .pipe(plumber())
       .pipe(sourcemaps.init())
@@ -51,7 +51,7 @@ gulp.task('style', function () {
       .pipe(server.stream());
 });
 
-gulp.task('browserify', function () {
+gulp.task('browserify', () => {
   return combiner.obj([
     browserify('js/main.js', {
       debug: true
@@ -72,7 +72,7 @@ gulp.task('browserify', function () {
   .on('error', console.error.bind(console));
 });
 
-gulp.task('images', function () {
+gulp.task('images', () => {
   return gulp.src('img/**/*.{jpg,png,svg}')
       .pipe(imagemin([
         imagemin.optipng({optimizationLevel: 3}),
@@ -82,13 +82,13 @@ gulp.task('images', function () {
       .pipe(gulp.dest('build/img'));
 });
 
-gulp.task('webp', function () {
+gulp.task('webp', () => {
   return gulp.src('img/**/*.{png,jpg}')
       .pipe(webp({quality: 90}))
       .pipe(gulp.dest('build/img'));
 });
 
-gulp.task('sprite', function () {
+gulp.task('sprite', () => {
   return gulp.src('img/*.svg')
       .pipe(svgstore({
         inlineSvg: true
@@ -97,7 +97,7 @@ gulp.task('sprite', function () {
       .pipe(gulp.dest('build/img'));
 });
 
-gulp.task('serve', function () {
+gulp.task('serve', () => {
   server.init({
     server: 'build/',
     notify: false,
@@ -106,7 +106,7 @@ gulp.task('serve', function () {
     ui: false
   });
 
-  gulp.watch('views/**/*.pug', function (event) {
+  gulp.watch('views/**/*.pug', (event) => {
     return renderViews(event.path);
   });
 
@@ -116,7 +116,7 @@ gulp.task('serve', function () {
   gulp.watch('img/**/*.{jpg,png,svg}', ['images', 'copy']);
 });
 
-gulp.task('copy', function () {
+gulp.task('copy', () => {
   return gulp.src([
     'fonts/**/*.{woff,woff2}',
     'img/**',
@@ -128,10 +128,10 @@ gulp.task('copy', function () {
       .pipe(gulp.dest('build'));
 });
 
-gulp.task('clean', function () {
+gulp.task('clean', () => {
   return del('build');
 });
 
-gulp.task('build', function (done) {
+gulp.task('build', (done) => {
   run('clean', 'copy', 'style', 'browserify', 'images', 'sprite', 'views', done);
 });
