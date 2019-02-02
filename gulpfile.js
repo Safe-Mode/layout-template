@@ -60,16 +60,14 @@ gulp.task('scripts', () => {
       .pipe(rollup({
         plugins: [
           resolve(),
-          commonjs({
-            include: 'node_modules/**'
-          }),
+          commonjs(),
           babel({
             babelrc: false,
             presets: [
               [
                 '@babel/env',
                 {
-                  useBuiltIns: 'usage'
+                  useBuiltIns: 'entry'
                 }
               ]
             ]
