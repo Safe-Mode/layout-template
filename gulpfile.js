@@ -70,7 +70,9 @@ const styles = () => {
   return src('scss/main.scss')
       .pipe(plumber())
       .pipe(sourcemaps.init())
-      .pipe(sass())
+      .pipe(sass({
+        includePaths: ['node_modules']
+      }))
       .pipe(postcss([
         autoprefixer()
       ]))
