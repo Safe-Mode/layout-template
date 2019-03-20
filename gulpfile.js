@@ -94,17 +94,7 @@ const scripts = () => {
         plugins: [
           resolve(),
           commonjs(),
-          babel({
-            babelrc: false,
-            presets: [
-              [
-                '@babel/env',
-                {
-                  useBuiltIns: 'usage'
-                }
-              ]
-            ]
-          })
+          babel()
         ]
       }, 'iife'))
       .pipe(uglify())
