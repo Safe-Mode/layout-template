@@ -1,6 +1,7 @@
 'use strict';
 
-const gulp = require('gulp');
+const path = require('path');
+const { src, dest, series, watch } = require('gulp');
 const sass = require('gulp-sass');
 const plumber = require('gulp-plumber');
 const postcss = require('gulp-postcss');
@@ -21,38 +22,60 @@ const commonjs = require(`rollup-plugin-commonjs`);
 const babel = require('rollup-plugin-babel');
 const pug = require('gulp-pug');
 
-const renderViews = (path) => {
-  return gulp.src(path)
+require('@babel/polyfill');
+
+const renderViews = (blob) => {
+  return src(blob)
     .pipe(plumber())
     .pipe(pug({
       pretty: true
     }))
-    .pipe(gulp.dest('build/'))
+    .pipe(dest('build'))
     .pipe(server.stream());
 };
 
-gulp.task('views', () => {
-  return renderViews('views/*.pug');
-});
+const clean = (done) => {
+  del('build');
+  done();
+};
 
-gulp.task('style', () => {
-  gulp.src('scss/main.scss')
+const copy = (done) => {
+  src([
+    'fonts/**/*.{woff,woff2}',
+    'img/**',
+    'video/**',
+    'js/transit/*.js'
+  ], {
+    base: '.'
+  })
+      .pipe(dest('build'));
+  done();
+};
+
+const views = (done) => {
+  renderViews('views/*.pug');
+  done();
+};
+
+const styles = (done) => {
+  src('scss/main.scss')
       .pipe(plumber())
       .pipe(sourcemaps.init())
       .pipe(sass())
       .pipe(postcss([
         autoprefixer()
       ]))
-      .pipe(gulp.dest('build/css'))
+      .pipe(dest('build/css'))
       .pipe(minify())
       .pipe(rename('style.min.css'))
       .pipe(sourcemaps.write(''))
-      .pipe(gulp.dest('build/css'))
+      .pipe(dest('build/css'))
       .pipe(server.stream());
-});
+  done();
+};
 
-gulp.task('scripts', () => {
-  return gulp.src('js/main.js')
+const scripts = (done) => {
+  src('js/main.js')
       .pipe(plumber())
       .pipe(sourcemaps.init({
         loadMaps: true
@@ -60,9 +83,7 @@ gulp.task('scripts', () => {
       .pipe(rollup({
         plugins: [
           resolve(),
-          commonjs({
-            include: 'node_modules/**'
-          }),
+          commonjs(),
           babel({
             babelrc: false,
             presets: [
@@ -79,36 +100,40 @@ gulp.task('scripts', () => {
       .pipe(uglify())
       .pipe(rename('script.min.js'))
       .pipe(sourcemaps.write(''))
-      .pipe(gulp.dest('build/js'))
+      .pipe(dest('build/js'))
       .pipe(server.stream());
-});
+  done();
+};
 
-gulp.task('images', () => {
-  return gulp.src('img/**/*.{jpg,png,svg}')
+const images = (done) => {
+  src('img/**/*.{jpg,png,svg}')
       .pipe(imagemin([
         imagemin.optipng({optimizationLevel: 3}),
         imagemin.jpegtran({progressive: true}),
         imagemin.svgo()
       ]))
-      .pipe(gulp.dest('build/img'));
-});
+      .pipe(dest('build/img'));
+  done();
+};
 
-gulp.task('webp', () => {
-  return gulp.src('img/**/*.{png,jpg}')
-      .pipe(webp({quality: 90}))
-      .pipe(gulp.dest('build/img'));
-});
+const toWebP = () => {
+  return src('img/**/*.{png,jpg}')
+      .pipe(webp({
+        quality: 90
+      }))
+      .pipe(dest('build/img'));
+};
 
-gulp.task('sprite', () => {
-  return gulp.src('img/*.svg')
+const sprite = () => {
+  return src('img/*.svg')
       .pipe(svgstore({
         inlineSvg: true
       }))
       .pipe(rename('sprite.svg'))
-      .pipe(gulp.dest('build/img'));
-});
+      .pipe(dest('build/img'));
+};
 
-gulp.task('serve', () => {
+const serve = () => {
   server.init({
     server: 'build/',
     notify: true,
@@ -117,32 +142,16 @@ gulp.task('serve', () => {
     ui: false
   });
 
-  gulp.watch('views/**/*.pug', (event) => {
-    return renderViews(event.path);
-  });
+  watch('**/*.pug')
+      .on('change', (blob) => {
+        renderViews(path.join(__dirname, blob));
+      });
 
-  gulp.watch('scss/**/*.{scss,sass}', ['style']);
-  gulp.watch('js/**/*.js', ['scripts']);
-  gulp.watch('views/**/*.pug', ['views']);
-  gulp.watch('img/**/*.{jpg,png,svg}', ['images', 'copy']);
-});
+  watch('scss/**/*.{scss,sass}', styles);
+  watch('js/**/*.js', scripts);
+  watch(['views/**/*.pug', '!views/*.pug'], views);
+  watch('img/**/*.{jpg,png,svg}', series(images, copy));
+};
 
-gulp.task('copy', () => {
-  return gulp.src([
-    'fonts/**/*.{woff,woff2}',
-    'img/**',
-    'video/**',
-    'js/transit/*.js'
-  ], {
-    base: '.'
-  })
-      .pipe(gulp.dest('build'));
-});
-
-gulp.task('clean', () => {
-  return del('build');
-});
-
-gulp.task('build', (done) => {
-  run('clean', 'copy', 'style', 'scripts', 'images', 'webp', 'sprite', 'views', done);
-});
+exports.build = series(clean, copy, views, styles, scripts, images);
+exports.serve = serve;
