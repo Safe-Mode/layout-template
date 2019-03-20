@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const { src, dest, series, watch } = require('gulp');
 const sass = require('gulp-sass');
 const plumber = require('gulp-plumber');
@@ -27,9 +28,7 @@ const renderViews = (blob) => {
     .pipe(pug({
       pretty: true
     }))
-    .pipe(dest('build/'), {
-      relativeSymlinks: true
-    })
+    .pipe(dest('build/'))
     .pipe(server.stream());
 };
 
@@ -114,7 +113,7 @@ const toWebP = () => {
 };
 
 const sprite = () => {
-  return src('img/*.svg')
+  return src('img/**/*.svg')
       .pipe(svgstore({
         inlineSvg: true
       }))
@@ -131,16 +130,17 @@ const serve = () => {
     ui: false
   });
 
-  watch('views/**/*.pug')
+  watch('views/*.pug')
       .on('change', (blob) => {
-        renderViews(blob);
+        renderViews(path.join(__dirname, blob));
       });
 
   watch('scss/**/*.{scss,sass}', styles);
   watch('js/**/*.js', scripts);
   watch(['views/**/*.pug', '!views/*.pug'], views);
   watch('img/**/*.{jpg,png,svg}', images);
+  watch('img/**/*.{svg}', sprite);
 };
 
-exports.build = series(clean, copy, images, views, styles, scripts);
+exports.build = series(clean, copy, images, sprite, views, styles, scripts);
 exports.serve = serve;
