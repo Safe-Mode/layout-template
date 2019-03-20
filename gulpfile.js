@@ -1,6 +1,5 @@
 'use strict';
 
-const path = require('path');
 const { src, dest, series, watch } = require('gulp');
 const sass = require('gulp-sass');
 const plumber = require('gulp-plumber');
@@ -13,7 +12,6 @@ const imagemin = require('gulp-imagemin');
 const webp = require('gulp-webp');
 const svgstore = require('gulp-svgstore');
 const del = require('del');
-const run = require('run-sequence');
 const uglify = require('gulp-uglify-es').default;
 const sourcemaps = require('gulp-sourcemaps');
 const rollup = require(`gulp-better-rollup`);
@@ -30,52 +28,62 @@ const renderViews = (blob) => {
     .pipe(pug({
       pretty: true
     }))
-    .pipe(dest('build'))
+    .pipe(dest('build/'), {
+      relativeSymlinks: true
+    })
     .pipe(server.stream());
 };
 
-const clean = (done) => {
-  del('build');
-  done();
+const clean = () => {
+  return del('build');
 };
 
-const copy = (done) => {
-  src([
+const copy = () => {
+  return src([
     'fonts/**/*.{woff,woff2}',
-    'img/**',
-    'video/**',
-    'js/transit/*.js'
+    'video/**'
   ], {
     base: '.'
   })
-      .pipe(dest('build'));
-  done();
+      .pipe(dest('build/'));
 };
 
-const views = (done) => {
-  renderViews('views/*.pug');
-  done();
+const images = () => {
+  return src('img/**/*.{jpg,png,svg}')
+      .pipe(imagemin([
+        imagemin.optipng({
+          optimizationLevel: 3
+        }),
+        imagemin.jpegtran({
+          progressive: true
+        }),
+        imagemin.svgo()
+      ]))
+      .pipe(dest('build/img/'));
 };
 
-const styles = (done) => {
-  src('scss/main.scss')
+const views = () => {
+  return renderViews('views/*.pug');
+};
+
+const styles = () => {
+  return src('scss/main.scss')
       .pipe(plumber())
       .pipe(sourcemaps.init())
       .pipe(sass())
       .pipe(postcss([
         autoprefixer()
       ]))
-      .pipe(dest('build/css'))
+      .pipe(dest('build/css/'))
       .pipe(minify())
-      .pipe(rename('style.min.css'))
+      .pipe(rename('styles.min.css'))
       .pipe(sourcemaps.write(''))
-      .pipe(dest('build/css'))
+      .pipe(dest('build/css/'))
       .pipe(server.stream());
-  done();
 };
 
-const scripts = (done) => {
-  src('js/main.js')
+const scripts = () => {
+  return src('js/main.js')
       .pipe(plumber())
       .pipe(sourcemaps.init({
         loadMaps: true
@@ -100,20 +108,8 @@ const scripts = (done) => {
       .pipe(uglify())
       .pipe(rename('script.min.js'))
       .pipe(sourcemaps.write(''))
-      .pipe(dest('build/js'))
+      .pipe(dest('build/js/'))
       .pipe(server.stream());
-  done();
-};
-
-const images = (done) => {
-  src('img/**/*.{jpg,png,svg}')
-      .pipe(imagemin([
-        imagemin.optipng({optimizationLevel: 3}),
-        imagemin.jpegtran({progressive: true}),
-        imagemin.svgo()
-      ]))
-      .pipe(dest('build/img'));
-  done();
 };
 
 const toWebP = () => {
@@ -121,7 +117,7 @@ const toWebP = () => {
       .pipe(webp({
         quality: 90
       }))
-      .pipe(dest('build/img'));
+      .pipe(dest('build/img/'));
 };
 
 const sprite = () => {
@@ -130,7 +126,7 @@ const sprite = () => {
         inlineSvg: true
       }))
       .pipe(rename('sprite.svg'))
-      .pipe(dest('build/img'));
+      .pipe(dest('build/img/'));
 };
 
 const serve = () => {
@@ -142,16 +138,16 @@ const serve = () => {
     ui: false
   });
 
-  watch('**/*.pug')
+  watch('views/**/*.pug')
       .on('change', (blob) => {
-        renderViews(path.join(__dirname, blob));
+        renderViews(blob);
       });
 
   watch('scss/**/*.{scss,sass}', styles);
   watch('js/**/*.js', scripts);
   watch(['views/**/*.pug', '!views/*.pug'], views);
-  watch('img/**/*.{jpg,png,svg}', series(images, copy));
+  watch('img/**/*.{jpg,png,svg}', images);
 };
 
-exports.build = series(clean, copy, views, styles, scripts, images);
+exports.build = series(clean, copy, images, views, styles, scripts);
 exports.serve = serve;
