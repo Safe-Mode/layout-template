@@ -13,7 +13,6 @@ const webp = require('gulp-webp');
 const svgstore = require('gulp-svgstore');
 const del = require('del');
 const uglify = require('gulp-uglify-es').default;
-const sourcemaps = require('gulp-sourcemaps');
 const rollup = require(`gulp-better-rollup`);
 const resolve = require('rollup-plugin-node-resolve');
 const commonjs = require(`rollup-plugin-commonjs`);
@@ -67,9 +66,10 @@ const views = () => {
 };
 
 const styles = () => {
-  return src('scss/main.scss')
+  return src('scss/main.scss', {
+    sourcemaps: true
+  })
       .pipe(plumber())
-      .pipe(sourcemaps.init())
       .pipe(sass({
         includePaths: ['node_modules']
       }))
@@ -79,17 +79,17 @@ const styles = () => {
       .pipe(dest('build/css/'))
       .pipe(minify())
       .pipe(rename('styles.min.css'))
-      .pipe(sourcemaps.write(''))
-      .pipe(dest('build/css/'))
+      .pipe(dest('build/css/', {
+        sourcemaps: '.'
+      }))
       .pipe(server.stream());
 };
 
 const scripts = () => {
-  return src('js/main.js')
+  return src('js/main.js', {
+    sourcemaps: true
+  })
       .pipe(plumber())
-      .pipe(sourcemaps.init({
-        loadMaps: true
-      }))
       .pipe(rollup({
         plugins: [
           resolve(),
@@ -108,9 +108,10 @@ const scripts = () => {
         ]
       }, 'iife'))
       .pipe(uglify())
-      .pipe(rename('script.min.js'))
-      .pipe(sourcemaps.write(''))
-      .pipe(dest('build/js/'))
+      .pipe(rename('scripts.min.js'))
+      .pipe(dest('build/js/', {
+        sourcemaps: '.'
+      }))
       .pipe(server.stream());
 };
 
