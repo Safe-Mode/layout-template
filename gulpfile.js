@@ -47,15 +47,14 @@ const copy = () => {
 };
 
 const images = () => {
-  return src('img/**/*.{jpg,png,svg}')
+  return src('img/**/*.{jpg,png}')
       .pipe(imagemin([
         imagemin.optipng({
           optimizationLevel: 3
         }),
         imagemin.jpegtran({
           progressive: true
-        }),
-        imagemin.svgo()
+        })
       ]))
       .pipe(dest('build/img/'));
 };
@@ -114,6 +113,9 @@ const toWebP = () => {
 
 const sprite = () => {
   return src('img/**/*.svg')
+      .pipe(imagemin([
+        imagemin.svgo()
+      ]))
       .pipe(svgstore({
         inlineSvg: true
       }))
@@ -138,8 +140,8 @@ const serve = () => {
   watch('scss/**/*.{scss,sass}', styles);
   watch('js/**/*.js', scripts);
   watch(['views/**/*.pug', '!views/*.pug'], views);
-  watch('img/**/*.{jpg,png,svg}', images);
-  watch('img/**/*.{svg}', sprite);
+  watch('img/**/*.{jpg,png}', images);
+  watch('img/**/*.svg', series(sprite, views));
 };
 
 exports.build = series(clean, copy, images, sprite, views, styles, scripts);
