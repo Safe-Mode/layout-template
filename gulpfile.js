@@ -19,6 +19,7 @@ const resolve = require('rollup-plugin-node-resolve');
 const commonjs = require(`rollup-plugin-commonjs`);
 const babel = require('rollup-plugin-babel');
 const pug = require('gulp-pug');
+const concat = require('gulp-concat');
 
 require('@babel/polyfill');
 
@@ -63,14 +64,28 @@ const views = () => {
   return renderViews('views/*.pug');
 };
 
-const styles = () => {
+const vendorCss = () => {
+  return src([
+    'normalize.css/normalize'
+  ], {
+    cwd: 'node_modules',
+    sourcemaps: true
+  })
+      .pipe(plumber())
+      .pipe(concat('vendors.css'))
+      .pipe(minify())
+      .pipe(rename('vendors.min.css'))
+      .pipe(dest('build/css/', {
+        sourcemaps: '.'
+      }));
+};
+
+const mainCss = () => {
   return src('scss/main.scss', {
     sourcemaps: true
   })
       .pipe(plumber())
-      .pipe(sass({
-        includePaths: ['node_modules']
-      }))
+      .pipe(sass())
       .pipe(postcss([
         autoprefixer()
       ]))
@@ -83,7 +98,21 @@ const styles = () => {
       .pipe(server.stream());
 };
 
-const scripts = () => {
+const vendorJs = () => {
+  return src([
+  ], {
+    cwd: 'node_modules',
+    sourcemaps: true
+  })
+      .pipe(concat('vendors.js'))
+      .pipe(uglify())
+      .pipe(rename('vendors.min.js'))
+      .pipe(dest('build/js/', {
+        sourcemaps: '.'
+      }));
+};
+
+const mainJs = () => {
   return src('js/main.js', {
     sourcemaps: true
   })
@@ -129,7 +158,17 @@ const serve = () => {
     notify: true,
     open: false,
     cors: true,
-    ui: false
+    ui: false,
+    middleware: [
+      (req, res, next) => {
+        const url = req.url;
+        const isIndex = url !== '/';
+        const hasExt = url.indexOf('.') === -1;
+
+        req.url = (hasExt && isIndex) ? url + '.html' : url;
+        next();
+      }
+    ]
   });
 
   watch('views/*.pug')
@@ -137,12 +176,14 @@ const serve = () => {
         renderViews(path.join(__dirname, blob));
       });
 
-  watch('scss/**/*.{scss,sass}', styles);
-  watch('js/**/*.js', scripts);
+  watch('scss/**/*.{scss,sass}', mainCss);
+  watch('js/**/*.js', mainJs);
   watch(['views/**/*.pug', '!views/*.pug'], views);
   watch('img/**/*.{jpg,png}', images);
   watch('img/**/*.svg', series(sprite, views));
+  watch('fonts/**/*.{woff,woff2}', copy);
 };
 
-exports.build = series(clean, copy, images, sprite, views, styles, scripts);
+exports.build = series(clean, copy, images, sprite, views, vendorCss, mainCss, vendorJs, mainJs);
 exports.serve = serve;
+exports.vendors = series(vendorCss, vendorJs);
