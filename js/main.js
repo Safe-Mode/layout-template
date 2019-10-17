@@ -1,7 +1,7 @@
-import {fn, set} from './app/module';
+import {fn} from './app/module';
 
 fn();
 
-const arr = [1, 'dfgd', 654, {}];
+const arr = [1, `dfgd`, 654, {}];
 
-console.log(arr.find((it) => typeof it === 'string'));
+console.log(arr.find((it) => typeof it === `string`));

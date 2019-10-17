@@ -1,6 +1,6 @@
 {
   "name": "layout-template",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "template to start interface's front-end dev",
   "main": "gulpfile.js",
   "dependencies": {
@@ -14,6 +14,7 @@
     "browser-sync": "^2.26.7",
     "del": "^5.1.0",
     "eslint": "^6.5.1",
+    "eslint-config-htmlacademy": "^0.5.2",
     "gulp": "^4.0.2",
     "gulp-better-rollup": "^4.0.1",
     "gulp-concat": "^2.6.1",
@@ -36,7 +37,7 @@
   },
   "scripts": {
     "editorconfig": "editorconfig-cli",
-    "stylelint": "stylelint sass/**/*.scss --syntax scss",
+    "stylelint": "stylelint scss/**/*.scss --syntax scss",
     "test": "npm run editorconfig && npm run stylelint && eslint js/",
     "build": "gulp build",
     "start": "npm run build && gulp serve",
