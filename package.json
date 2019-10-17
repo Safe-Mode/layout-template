@@ -39,7 +39,8 @@
     "stylelint": "stylelint sass/**/*.scss --syntax scss",
     "test": "npm run editorconfig && npm run stylelint && eslint js/",
     "build": "gulp build",
-    "start": "npm run build && gulp serve"
+    "start": "npm run build && gulp serve",
+    "vendors": "gulp vendors"
   },
   "repository": {
     "type": "git",

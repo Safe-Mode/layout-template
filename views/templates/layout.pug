@@ -10,6 +10,7 @@ html.no-js(lang="ru")
     meta(name="description", content="")
     meta(name="viewport", content="width=device-width, initial-scale=1, minimal-ui")
     title #{title}
+    link(rel="stylesheet", href="css/vendors.min.css")
     link(rel="stylesheet", href="css/styles.min.css")
 
   body.page
@@ -18,4 +19,5 @@ html.no-js(lang="ru")
     include ../includes/footer
 
     block scripts
+    script(src="js/vendors.min.js")
     script(src="js/scripts.min.js")
