@@ -1,0 +1,10 @@
+{
+  "editorconfig-cli": [
+    "*.js",
+    "*.json",
+    "img/**/*.svg",
+    "views/**/*.pug",
+    "scss/**/*.{sass,scss}",
+    "js/**/*.js"
+  ]
+}

@@ -36,7 +36,7 @@
     "stylelint-config-htmlacademy": "^0.1.4"
   },
   "scripts": {
-    "editorconfig": "editorconfig-cli",
+    "editorconfig": "editorconfig-cli -j glob.json",
     "stylelint": "stylelint scss/**/*.scss --syntax scss",
     "eslint": "eslint js/**/*.js",
     "test": "npm run editorconfig && npm run stylelint && npm run eslint",
