@@ -21,8 +21,6 @@ const babel = require('rollup-plugin-babel');
 const pug = require('gulp-pug');
 const concat = require('gulp-concat');
 
-require('@babel/polyfill');
-
 const renderViews = (blob) => {
   return src(blob)
     .pipe(plumber())
@@ -66,7 +64,7 @@ const views = () => {
 
 const vendorCss = () => {
   return src([
-    'normalize.css/normalize'
+    'normalize.css/normalize.css'
   ], {
     cwd: 'node_modules',
     sourcemaps: true
@@ -100,9 +98,10 @@ const mainCss = () => {
 
 const vendorJs = () => {
   return src([
+    ' '
   ], {
     cwd: 'node_modules',
-    sourcemaps: true
+    sourcemaps: true,
   })
       .pipe(concat('vendors.js'))
       .pipe(uglify())
